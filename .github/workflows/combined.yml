@@ -1,0 +1,49 @@
+name: combined
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./rust
+    steps:
+    - uses: actions/checkout@v3
+    - name: clippy
+      run: cargo clippy --verbose
+    - name: build
+      run: cargo check --verbose
+
+  view:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    defaults:
+      run:
+        working-directory: ./view
+    steps:
+    - uses: actions/checkout@v3
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
+        cache-dependency-path: 'view/pnpm-lock.yaml'
+    - name: Install dependencies
+      run: pnpm install
+    - name: eslint
+      run: pnpm lint
+    - name: build
+      run: pnpm build
