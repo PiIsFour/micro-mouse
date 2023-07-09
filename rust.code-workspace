@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "rust"
+		}
+	],
+	"settings": {
+		"rust-analyzer.check.command": "clippy",
+		"git.openRepositoryInParentFolders": "always"
+	}
+}
